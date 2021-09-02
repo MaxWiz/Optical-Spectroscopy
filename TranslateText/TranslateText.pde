@@ -1,57 +1,66 @@
-String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/H20_2.txt";
+String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/run2.txt";
+BufferedReader reader;
+String line;
+int lineNumber;
 
-import processing.serial.*;
-Serial myPort;
-PrintWriter output;
-
-float startP, stopP;  //scan range
 float Ymax=0.1;    //maximum Y-coordinate value
 float autoYscale=1.5;
 int X1, Y1;        //integer variable for plotting
+float startP, stopP;  //scan range
 
-boolean firstContact=false;
-int [] serialInArray=new int[4];  //4 bytes to read
-int serialCount=0;
-boolean getRange=false;
-boolean newData=false;
 float[] Xdata=new float[30000];
 float[] Ydata=new float[30000];
-int dataN=0;
-int NetDataCount=2;
 float scanDir=1.0;
+boolean newData=true;
+int dataN=0;
 
 int[] RGBvalues=new int[4];
 float wavelength, R, G, B, T;
 
 void setup(){
-  output=createWriter(filename);
+  lineNumber=0;
   size(1300,800);  //sets the size of drawing window
-  println(Serial.list());
   delay(1000);
-  String portName=Serial.list()[0];
-  myPort=new Serial(this, portName, 9600);
+  reader = createReader(filename);
+  try {
+    line = reader.readLine();
+  } catch (IOException e) {
+    e.printStackTrace();
+    line = null;
+  }
+  while (line != null) {
+    String[] pieces = split(line, TAB); 
+    if (lineNumber==0) {
+      startP = float(pieces[0]);
+      println(startP);
+    }
+    if (lineNumber < 30000) {
+      Xdata[lineNumber] = float(pieces[0]);
+      Ydata[lineNumber] = float(pieces[1]);
+    }
+    lineNumber++;
+    dataN++;
+    try {
+      line = reader.readLine();
+    } catch (IOException e) {
+      e.printStackTrace();
+      line = null;
+      }
+    }
+  stopP = Ydata[Ydata.length -1];
+  println(stopP);
+  noLoop();
 }
 
-void draw(){
-  if (newData==true){
-    if (Ydata[dataN-1]>Ymax){
-      Ymax=autoYscale*Ydata[dataN-1];
-    }
-    println(dataN-1 + "\t" + Xdata[dataN-1] + "\t" + Ydata[dataN-1]);
-    newData=false;
-  }
+void draw() {
+  //if (newData==true){
+  //  if (Ydata[dataN-1]>Ymax){
+  //    Ymax=autoYscale*Ydata[dataN-1];
+  //  }
+  //  println(dataN-1 + "\t" + Xdata[dataN-1] + "\t" + Ydata[dataN-1]);
+  //  newData=false;
+  //}
   plot();
-  if (dataN==NetDataCount) {
-    for (int i=0;i<dataN;i++){
-      output.println(Xdata[i] + "\t" + Ydata[i]);
-    }
-    output.close();
-    println("Data file saved. End of the run");
-    String filenameImage = filename.substring(0, filename.length()-3) + "png";
-    save(filenameImage);
-    println("Image saved.");
-    while(true){ }
-  }
 }
 
 void plot(){
@@ -97,38 +106,6 @@ void plot(){
     T=RGBvalues[3];
     stroke(int(R),int(G),int(B),int(T));  //set the color
     line(100+X1,700,100+X1,700-Y1);      //draw a vertical line
-  }
-}
-
-void serialEvent(Serial myPort){
-  int inByte=myPort.read();
-  if(firstContact==false){  
-    if(inByte=='A'){
-      myPort.clear();
-      firstContact=true;
-      myPort.write("B");
-    }
-  } else {
-      serialInArray[serialCount]=inByte;
-      serialCount++;
-      if (serialCount>3){
-        if(getRange==false){
-          startP=float(serialInArray[0]*256+serialInArray[1])/10;
-          stopP=float(serialInArray[2]*256+serialInArray[3])/10;
-          NetDataCount=int(abs(stopP-startP)/0.125);
-          if (startP>stopP) {scanDir=-1.0;}
-          serialCount=0;
-          myPort.write("C");
-          getRange=true;
-        } else {
-          Xdata[dataN]=startP+scanDir*0.125*float(serialInArray[0]*256+serialInArray[1]);
-          Ydata[dataN]=(float(serialInArray[2]*256+serialInArray[3]))/10000;
-          myPort.write("D");
-          dataN++;
-          serialCount=0;
-          newData=true;
-        }
-      }
   }
 }
 

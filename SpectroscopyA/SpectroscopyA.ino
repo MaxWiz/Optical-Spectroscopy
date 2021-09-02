@@ -1,9 +1,9 @@
 float startP=300;   //scan start wavelength
 float stopP=900;  //scan stop wavelength
-float currentP=300; //current wavelength
+float currentP=900; //current wavelength
 
-int readySpeed=6;       //moving speed to the scan start
-int scanSpeed=20;       //scan speed
+int readySpeed=10;       //moving speed to the scan start
+int scanSpeed=5;       //scan speed
 int readSpeed=15;       //data taking speed
 
 int Step=3;     //Arduino pin #3 to the setp pin of A4988
