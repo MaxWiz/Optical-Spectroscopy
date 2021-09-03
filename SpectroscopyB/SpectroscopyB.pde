@@ -1,4 +1,5 @@
-String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/H20_2.txt";
+//file naming rules: "Molecule_magnification_wavelength range_run number"
+String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/CO2_10-7_3-9nm_run5.txt";
 
 import processing.serial.*;
 Serial myPort;
@@ -68,7 +69,8 @@ void plot(){
   }
   fill(0);
   textSize(30);
-  text(filename,200,35);
+  String shortName = filename.substring(filename.length() -23 , filename.length());
+  text(shortName,400,35);
   textSize(18);
   text(str(startP),80,730);
   text(str(stopP),1180,730);
@@ -77,12 +79,12 @@ void plot(){
   text(str(Ymax),30,39);
   
   textSize(24);
-  text("wavelength (nm)",570,750);
+  text("Wavelength (nm)",570,750);
   
   pushMatrix();
   translate(55,420);
   rotate(-HALF_PI);
-  text("intensity",0,0);
+  text("Intensity",0,0);
   popMatrix();
   
   stroke(255,0,0);  //pencil color red
