@@ -1,5 +1,5 @@
 //file naming rules: "Molecule_magnification_wavelength range_run number"
-String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/LED_10-8_3-9nm_run1.txt";
+String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/L'sPhoneLED_10-5_3-9nm_run1.txt";
 
 import processing.serial.*;
 Serial myPort;
