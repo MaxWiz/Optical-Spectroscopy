@@ -1,4 +1,4 @@
-String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/H_10-7_3-5nm_run2.txt";
+String filename="C:/Users/labuser/Documents/GitHub/Optical-Spectroscopy/H_10-7_3-5nm_run2.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
@@ -13,6 +13,7 @@ float x1,x2,y1,y2,x3,x4,y3,y4;
 float m1;
 float m2;
 float averageV;
+float energy;
 
 void setup() {
   lineNumber=0;
@@ -55,7 +56,7 @@ void draw() {
     if ((m1>0) && (m2<0)) {
       possible[entries] = ((x2+x3)/2);
       possible[entries+1] = ((y2+y3)/2);
-      println(possible[entries] + "\t" + possible[entries+1]);
+      //println(possible[entries] + "\t" + possible[entries+1]);
       entries+=2;
     }
   }
@@ -75,6 +76,8 @@ void draw() {
   for (int j=0; j<999; j+=2) {
     if (maxima[j+1]!=0.0) {
       println(maxima[j] + "\t" + maxima[j+1]);
+      energy=(6.63*pow(10, -34)*3*pow(10, 8))/(maxima[j]*pow(10,-9)*1.6*pow(10,-19));
+      println("Energy: " + energy + "eV");
     }
   }
   while (true) {}
