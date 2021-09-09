@@ -1,6 +1,6 @@
 float startP=300;   //scan start wavelength
 float stopP=900;  //scan stop wavelength
-float currentP=900; //current wavelength
+float currentP=622.8; //current wavelength
 
 int readySpeed=5;       //moving speed to the scan start
 int scanSpeed=5;       //scan speed
