@@ -1,10 +1,11 @@
-String filename="C:/Users/maxwi/Documents/GitHub/Optical-Spectroscopy/run2.txt";
+//Variables essential to reading and printing the txt file
+String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/H_10-7_3-5nm_run2.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
 
-float Ymax=0.1;    //maximum Y-coordinate value
-float autoYscale=1.5;
+float Ymax=0.1;    //maximum Y-coordinate value, adjusted as data is read
+float autoYscale=1.1; // variable for scaling the Y axis
 int X1, Y1;        //integer variable for plotting
 float startP, stopP;  //scan range
 
@@ -16,6 +17,24 @@ int dataN=0;
 
 int[] RGBvalues=new int[4];
 float wavelength, R, G, B, T;
+
+//Variables added for the maximum printing
+float[] peaks=new float[6000];
+int peakN;
+float[] troughs=new float[6000];
+int troughN;
+float[] sortM=new float[200];
+int sortN;
+
+int k;
+float[] maxima=new float[1000];
+
+float total;
+float averageV;
+float cutoff;
+
+float[] unkTable=new float[6000];
+boolean unk;
 
 void setup(){
   lineNumber=0;
@@ -32,11 +51,11 @@ void setup(){
     String[] pieces = split(line, TAB); 
     if (lineNumber==0) {
       startP = float(pieces[0]);
-      println(startP);
     }
     if (lineNumber < 30000) {
       Xdata[lineNumber] = float(pieces[0]);
       Ydata[lineNumber] = float(pieces[1]);
+      total+=float(pieces[1]);
     }
     lineNumber++;
     dataN++;
@@ -47,19 +66,15 @@ void setup(){
       line = null;
       }
     }
-  stopP = Ydata[Ydata.length -1];
-  println(stopP);
+  String[] pieces2 = split(filename, "_");
+  stopP = Float.parseFloat(pieces2[2].substring(2,3))*100;
   noLoop();
 }
 
 void draw() {
-  //if (newData==true){
-  //  if (Ydata[dataN-1]>Ymax){
-  //    Ymax=autoYscale*Ydata[dataN-1];
-  //  }
-  //  println(dataN-1 + "\t" + Xdata[dataN-1] + "\t" + Ydata[dataN-1]);
-  //  newData=false;
-  //}
+  if (Ydata[dataN-1]>Ymax){
+  Ymax=autoYscale*getMaxY(Ydata);
+  }
   plot();
 }
 
@@ -77,7 +92,8 @@ void plot(){
   }
   fill(0);
   textSize(30);
-  text(filename,200,35);
+  String shortName = filename.substring(51, filename.length());
+  text(shortName,500,35);
   textSize(18);
   text(str(startP),80,730);
   text(str(stopP),1180,730);
@@ -86,12 +102,12 @@ void plot(){
   text(str(Ymax),30,39);
   
   textSize(24);
-  text("wavelength (nm)",570,750);
+  text("Wavelength (nm)",570,750);
   
   pushMatrix();
   translate(55,420);
   rotate(-HALF_PI);
-  text("intensity",0,0);
+  text("Intensity (V)",0,0);
   popMatrix();
   
   stroke(255,0,0);  //pencil color red
@@ -107,6 +123,7 @@ void plot(){
     stroke(int(R),int(G),int(B),int(T));  //set the color
     line(100+X1,700,100+X1,700-Y1);      //draw a vertical line
   }
+  printMaxima();
 }
 
 int[] getRGB(float wavelength){
@@ -134,4 +151,120 @@ int[] getRGB(float wavelength){
   RGBvalues[2]=int(B*255);
   RGBvalues[3]=int(T*255);
   return RGBvalues;
+}
+
+float getMaxY(float[] Y) {
+  float maxY=0.0;
+  for(int i=0; i < dataN; i++) {
+    if(Y[i] > maxY) {
+      maxY = Y[i];
+    }
+  }
+  return maxY;
+}
+
+void printMaxima() {
+  for(int i=0; i<29996; i++) {
+    float x1,x2,y1,y2,x3,x4,y3,y4,m1,m2;
+    x1=Xdata[i];
+    y1=Ydata[i];
+    x2=Xdata[i+1];
+    y2=Ydata[i+1];
+    x3=Xdata[i+2];
+    y3=Ydata[i+2];
+    x4=Xdata[i+3];
+    y4=Ydata[i+3];
+    m1 = (y2-y1)/(x2-x1);
+    m2 = (y4-y3)/(x4-x3);
+    if ((m1>0) && (m2<0)) {
+      peaks[peakN] = ((x2+x3)/2);
+      peaks[peakN+1] = ((y2+y3)/2);
+      peakN+=2;
+    }
+    if ((m1<0) && (m2>0)) {
+      troughs[troughN] = ((x2+x3)/2);
+      troughs[troughN+1] = ((y2+y3)/2);
+      troughN+=2;
+    }
+  }
+  peakN=0;
+  averageV=total/lineNumber;
+  for (int i=0; i<5999; i+=2) {
+    if(troughs[i] != 0) {
+      float[] max = findRelMax(troughs[i], troughs[i+2]);
+      unk=true;
+      for(int j=0; j<5999; j++) {
+        if ((unkTable[j] <= max[0]+2) && (unkTable[j] >= max[0]-2)) {
+          unk=false;
+        }
+      }
+      unkTable[i] = max[0];
+      cutoff = 1.5*averageV;
+      if ((max[1] > cutoff) && (unk)) {
+        maxima[peakN]=max[0];
+        maxima[peakN+1]=max[1];
+        peakN+=2;
+      }
+    }
+  }
+  println("Printing Maxima");
+  for (int j=0; j<999; j+=2) {
+    float energy = 0.0;
+    if (maxima[j+1]!=0.0) {
+      X1=int(map(maxima[j], startP, stopP, 0, 1100));  //rescale to pixel numbers
+      Y1=int(map(maxima[j+1], 0, Ymax, 0, 650)); 
+      RGBvalues=getRGB(maxima[j]);
+      R=RGBvalues[0];
+      G=RGBvalues[1];
+      B=RGBvalues[2];
+      T=RGBvalues[3];
+      stroke(0x0);  //set the color
+      strokeWeight(2);
+      line(X1+100,690-Y1,X1+100,670-Y1);      //draw a vertical line
+      //println(maxima[j] + "\t" + maxima[j+1]);
+      energy=(6.63*pow(10, -34)*3*pow(10, 8))/(maxima[j]*pow(10,-9)*1.6*pow(10,-19));
+      //println("Energy: " + energy + "eV");
+      fill(0);
+      textSize(18);
+      text(str(maxima[j])+" nm, "+str(energy)+" eV",X1,660-Y1);
+      textSize(16);
+      int avgY = (int)(700-(averageV/Ymax)*600);
+      text("Average V",20,avgY+5);
+      strokeWeight(1);
+      for (int i=0; i<32; i++) {
+        line(105+(35*i),avgY,115+(35*i),avgY);
+      }
+      fill(0);
+      textSize(18);
+      text(str(maxima[j])+" nm, "+str(energy)+" eV",X1,660-Y1);
+      textSize(16);
+      text("Cutoff V",20,cutoff+5);
+      strokeWeight(1);
+      for (int i=0; i<32; i++) {
+        line(105+(35*i),cutoff,115+(35*i),cutoff);
+      }
+    }
+  }
+  println("Ymax: "+ Ymax);
+}
+
+float[] findRelMax(float start, float end) {
+  float[] pair={0.0, 0.0};
+  for (int i=0; i < 5999; i+=2) {
+    if ((peaks[i] > start-10) && (peaks[i] < end+10)) {
+      sortM[sortN] = peaks[i];
+      sortM[sortN+1] = peaks[i+1];
+      sortN+=2;
+    }
+  }
+  int current = 0;
+  while (current < 199) {
+    if (sortM[current+1] > pair[1]) {
+      pair[0] = sortM[current];
+      pair[1] = sortM[current+1];
+    }
+    current+=2;
+  }
+  sortN = 0;
+  return pair;
 }
