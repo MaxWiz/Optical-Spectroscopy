@@ -36,7 +36,7 @@ void setup() {
     String[] pieces1 = split(line, TAB);
     Xdata[k]=float(pieces1[0]);
     Ydata[k]=float(pieces1[1]);
-    total+=Ydata[k];
+    
     lineNumber++;
     k++;
     try {

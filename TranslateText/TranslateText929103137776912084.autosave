@@ -1,5 +1,5 @@
 //Variables essential to reading and printing the txt file
-String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/60WRevealLED_10-6_3-9nm_run2.txt";
+String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/H_10-7_3-5nm_run2.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
@@ -19,11 +19,11 @@ int[] RGBvalues=new int[4];
 float wavelength, R, G, B, T;
 
 //Variables added for the maximum printing
-float[] peaks=new float[12000];
+float[] peaks=new float[6000];
 int peakN;
-float[] troughs=new float[12000];
+float[] troughs=new float[6000];
 int troughN;
-float[] sortM=new float[12000];
+float[] sortM=new float[200];
 int sortN;
 
 int k;
@@ -33,9 +33,8 @@ float total;
 float averageV;
 float cutoff;
 
-float[] unkTable=new float[12000];
+float[] unkTable=new float[6000];
 boolean unk;
-String shortName;
 
 void setup(){
   lineNumber=0;
@@ -73,7 +72,9 @@ void setup(){
 }
 
 void draw() {
+  if (Ydata[dataN-1]>Ymax){
   Ymax=autoYscale*getMaxY(Ydata);
+  }
   plot();
 }
 
@@ -91,8 +92,8 @@ void plot(){
   }
   fill(0);
   textSize(30);
-  shortName = filename.substring(51, filename.length()-4) + "_Maximums.txt";
-  text(shortName,400,35);
+  String shortName = filename.substring(51, filename.length());
+  text(shortName,500,35);
   textSize(18);
   text(str(startP),80,730);
   text(str(stopP),1180,730);
@@ -188,21 +189,16 @@ void printMaxima() {
   }
   peakN=0;
   averageV=total/lineNumber;
-  for (int i=0; i<11998; i+=2) {
-    if (troughs[i] != 0.0) {
-    println(troughs[i], troughs[i+2]);
-    float[] max = findRelMax(troughs[i], troughs[i+2]);
-    //println(max[0] + "\t" + max[1]);
-    unk=true;
-      for(int j=0; j<11999; j++) {
-        if ((unkTable[j] <= max[0]+20) && (unkTable[j] >= max[0]-20)) {
+  for (int i=0; i<5999; i+=2) {
+    if(troughs[i] != 0) {
+      float[] max = findRelMax(troughs[i], troughs[i+2]);
+      unk=true;
+      for(int j=0; j<5999; j++) {
+        if ((unkTable[j] <= max[0]+2) && (unkTable[j] >= max[0]-2)) {
           unk=false;
         }
       }
-      if (unk) {
-        unkTable[i] = max[0];
-        //println(max[0] + "\t" + max[1]);
-      }
+      unkTable[i] = max[0];
       cutoff = 1.5*averageV;
       if ((max[1] > cutoff) && (unk)) {
         maxima[peakN]=max[0];
@@ -242,32 +238,28 @@ void printMaxima() {
       textSize(18);
       text(str(maxima[j])+" nm, "+str(energy)+" eV",X1,660-Y1);
       textSize(16);
-      int cutoffV = (int)(700-(cutoff/Ymax)*600);
-      text("Cutoff V",20,cutoffV+5);
+      int cutoffY = (int)(700-(cutoff/Ymax)*600);
+      text("Cutoff V",20,cutoffY+5);
       strokeWeight(1);
-      for (int i=0; i<32; i++) {
-        line(105+(35*i),cutoffV,115+(35*i),cutoffV);
+      for (int i=0; i<31; i++) {
+        line(120+(35*i),cutoffY,130+(35*i),cutoffY);
       }
     }
   }
   println("Ymax: "+ Ymax);
-  String filenameImage = filename.substring(0, filename.length()-4) + "_Maximums.png";
-  println(filenameImage);
-  save(filenameImage);
-  println("Image saved.");
 }
 
 float[] findRelMax(float start, float end) {
   float[] pair={0.0, 0.0};
-  for (int i=0; i < 11998; i+=2) {
-    if ((peaks[i] > start) && (peaks[i] < end)) {
+  for (int i=0; i < 5999; i+=2) {
+    if ((peaks[i] > start-10) && (peaks[i] < end+10)) {
       sortM[sortN] = peaks[i];
       sortM[sortN+1] = peaks[i+1];
       sortN+=2;
     }
   }
   int current = 0;
-  while (current < 11999) {
+  while (current < 199) {
     if (sortM[current+1] > pair[1]) {
       pair[0] = sortM[current];
       pair[1] = sortM[current+1];

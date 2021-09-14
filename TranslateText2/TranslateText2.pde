@@ -1,5 +1,5 @@
 //Variables essential to reading and printing the txt file
-String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/60WRevealLED_10-6_3-9nm_run2.txt";
+String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/YellowLED_10-7_3-9nm_run2.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
@@ -69,6 +69,7 @@ void setup(){
     }
   String[] pieces2 = split(filename, "_");
   stopP = Float.parseFloat(pieces2[2].substring(2,3))*100;
+  //stopP = 900.0;
   noLoop();
 }
 
@@ -188,27 +189,22 @@ void printMaxima() {
   }
   peakN=0;
   averageV=total/lineNumber;
-  for (int i=0; i<11998; i+=2) {
-    if (troughs[i] != 0.0) {
-    println(troughs[i], troughs[i+2]);
-    float[] max = findRelMax(troughs[i], troughs[i+2]);
-    //println(max[0] + "\t" + max[1]);
+  for (int i=0; i<=895; i+=5) {
+    float[] max = findRelMax(i-30, i+30);
     unk=true;
-      for(int j=0; j<11999; j++) {
-        if ((unkTable[j] <= max[0]+20) && (unkTable[j] >= max[0]-20)) {
-          unk=false;
+    for(int j=0; j<11999; j++) {
+      if ((unkTable[j] >= max[0]-20) && (unkTable[j] != 0)) {
+        unk=false;
         }
-      }
-      if (unk) {
-        unkTable[i] = max[0];
-        //println(max[0] + "\t" + max[1]);
-      }
-      cutoff = 1.5*averageV;
-      if ((max[1] > cutoff) && (unk)) {
-        maxima[peakN]=max[0];
-        maxima[peakN+1]=max[1];
-        peakN+=2;
-      }
+    }
+    if (unk) {
+      unkTable[i] = max[0];
+    }
+    cutoff = 1.5*averageV;
+    if ((max[1] > cutoff) && (unk)) {
+      maxima[peakN]=max[0];
+      maxima[peakN+1]=max[1];
+      peakN+=2;
     }
   }
   println("Printing Maxima");
