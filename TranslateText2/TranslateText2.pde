@@ -1,5 +1,5 @@
 //Variables essential to reading and printing the txt file
-String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/YellowLED_10-7_3-9nm_run2.txt";
+String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/run1.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
@@ -68,8 +68,8 @@ void setup(){
       }
     }
   String[] pieces2 = split(filename, "_");
-  stopP = Float.parseFloat(pieces2[2].substring(2,3))*100;
-  //stopP = 900.0;
+  //stopP = Float.parseFloat(pieces2[2].substring(2,3))*100;
+  stopP = 900.0;
   noLoop();
 }
 
