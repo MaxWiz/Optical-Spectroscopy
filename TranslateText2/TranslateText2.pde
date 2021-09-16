@@ -1,5 +1,5 @@
 //Variables essential to reading and printing the txt file
-String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/run1.txt";
+String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/L'sPhoneLED_10-5_3-9nm_run2.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
