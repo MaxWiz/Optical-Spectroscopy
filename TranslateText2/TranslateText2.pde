@@ -1,5 +1,5 @@
 //Variables essential to reading and printing the txt file
-String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/L'sPhoneLED_10-5_3-9nm_run2.txt";
+String filename="C:/Users/Max/Documents/GitHub/Optical-Spectroscopy/WhiteLED_10-8_3-9nm_run1.txt";
 BufferedReader reader;
 String line;
 int lineNumber;
@@ -56,6 +56,7 @@ void setup(){
     if (lineNumber < 30000) {
       Xdata[lineNumber] = float(pieces[0]);
       Ydata[lineNumber] = float(pieces[1]);
+      stopP = Xdata[lineNumber];
       total+=float(pieces[1]);
     }
     lineNumber++;
@@ -67,9 +68,6 @@ void setup(){
       line = null;
       }
     }
-  String[] pieces2 = split(filename, "_");
-  //stopP = Float.parseFloat(pieces2[2].substring(2,3))*100;
-  stopP = 900.0;
   noLoop();
 }
 
@@ -92,7 +90,7 @@ void plot(){
   }
   fill(0);
   textSize(30);
-  shortName = filename.substring(51, filename.length()-4) + "_Maximums.txt";
+  shortName = filename.substring(51, filename.length()-4) + "_Maximums.txt";  //Will likely need altering
   text(shortName,400,35);
   textSize(18);
   text(str(startP),80,730);
@@ -249,7 +247,7 @@ void printMaxima() {
   println("Ymax: "+ Ymax);
   String filenameImage = filename.substring(0, filename.length()-4) + "_Maximums.png";
   println(filenameImage);
-  save(filenameImage);
+  //save(filenameImage);
   println("Image saved.");
 }
 
