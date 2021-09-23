@@ -247,7 +247,7 @@ void printMaxima() {
   println("Ymax: "+ Ymax);
   String filenameImage = filename.substring(0, filename.length()-4) + "_Maximums.png";
   println(filenameImage);
-  //save(filenameImage);
+  save(filenameImage);
   println("Image saved.");
 }
 

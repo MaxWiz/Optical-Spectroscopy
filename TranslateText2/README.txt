@@ -55,6 +55,8 @@ Lines 202 through 205 just filter out any maximum smaller than the cutoff voltag
 Lines 209 through 252 should not need editing, they just control the printing of the maxima labels and lines, as well as
 averageV and cutoffV.
 
+Line 248 will require adjustment, much like Line 93, since it determines the Image filename that it will be saved as.
+
 EXTREMELY IMPORTANT!
 A small note about arrays peaks, troughs, sortM, max, and maxima.  They all index in a fashion that I prefer so that I do 
 not need 2 arrays for every single type of value.  Since every peak and trough, and generally every point of data collected 
